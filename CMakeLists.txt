@@ -12,7 +12,7 @@ find_package(cereal REQUIRED)
 
 file(GLOB_RECURSE sources "src/**.cpp")
 
-add_library(entt_snapshot SHARED
+add_library(entt_snapshot STATIC
     ${sources}
 )
 target_link_libraries(entt_snapshot EnTT::EnTT cereal::cereal)
