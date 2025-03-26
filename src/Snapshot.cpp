@@ -32,7 +32,19 @@ namespace snapshot
 
         auto e_serial = detail::SerializeHandleEntity{.e = e, .components = std::vector<Handle>{}};
 
-        // Use the registry's type info to iterate through all possible component types
+        for(auto &&curr: h.registry()->storage()) {
+            if(auto &storage = curr.second; storage.contains(e)) {
+                auto refl_comp = ComponentReflection{storage.type()};
+                if (refl_comp) {
+                    auto comp_name = refl_comp.reflection().name();
+                    if (should_serialize(comp_name.data())) {
+                        e_serial.components.push_back(Handle{refl_comp.get(h)});
+                    }
+                }
+            }
+        }
+
+/*         // Use the registry's type info to iterate through all possible component types
         for(const auto& [type_id, storage] : h.registry()->storage())
         {
             // Check if this entity has this component type
@@ -48,7 +60,7 @@ namespace snapshot
                     }
                 }
             }
-        }
+        } */
 
         auto label = std::to_string((size_t)e);
         archive(cereal::make_nvp(label, e_serial));
